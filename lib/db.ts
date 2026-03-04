@@ -19,7 +19,7 @@ try{
 
 mongoose.connect(MONGODB_URI! , {
 
-    dbName:'LoLify',
+    dbName:'Escape-X',
     bufferCommands:true 
 });
 
