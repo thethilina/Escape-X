@@ -1,9 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Jaro&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
+
+.jaro-font {
+  font-family: 'Jaro', sans-serif;
+}
+
+
 
 @theme inline {
   --color-background: var(--background);
