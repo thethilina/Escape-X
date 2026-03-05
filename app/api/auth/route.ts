@@ -23,6 +23,8 @@ if(!username || !password || username === "" || password === ""){
 await connect();
 
 const user = await User.findOne({username});
+const user2 = await User.findOne({username}).select("-password");
+
 
 if(!user){
 
@@ -43,7 +45,7 @@ if (!secret) {
 const payload = {id: user._id.toString() , email : user.email}
 const token = sign(payload , secret , {expiresIn : "7d"});
 
-const res = NextResponse.json({user:user});
+const res = NextResponse.json({user:user2});
 
 
 
