@@ -1,11 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Jaro } from 'next/font/google';
-const jaro = Jaro({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-jaro",
-});
+
 
 
 export default function Home() {
