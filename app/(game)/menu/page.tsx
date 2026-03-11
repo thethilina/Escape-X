@@ -1,6 +1,7 @@
 import React from 'react'
 
 import pet from "../../../public/pet.png"
+import Link from 'next/link'
 
 function page() {
   return (
@@ -10,10 +11,10 @@ function page() {
     <div className="flex flex-col items-start space-y-10">
         <h1 className="jaro-font  text-7xl text-[#F46BC6]" style={{ textShadow: "1px 2px 0px #FFFFFF" }}>Escape-X</h1>
 
-        <button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Play</button>
-        <button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Leader Board</button>
-        <button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Profile</button>
-        <h2 className='text-xl font-bold text-[#aa2c2c] hover:cursor-pointer px-3'>Log Out</h2>
+        <Link href="/play"><button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Play</button></Link>
+        <Link href="/leaderboard"><button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Leader Board</button></Link>
+        <Link href="/profile"><button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Profile</button></Link>
+     <h2 className='text-xl font-bold text-[#aa2c2c] hover:cursor-pointer px-3'>Log Out</h2>
 </div>
 
    
