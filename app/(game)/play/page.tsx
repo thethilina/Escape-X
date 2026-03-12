@@ -2,6 +2,17 @@
 import { useState } from "react"
 
 const Page = () => {
+
+
+
+
+
+
+
+
+
+
+
   // 0 = wall, 6 = space npc can move, 5 = doors, 1 = enemy 2 = player
   const [maze, setMaze] = useState<number[][]>([
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -18,6 +29,16 @@ const Page = () => {
   ])
 
   return (
+
+
+
+
+
+
+
+
+
+
     <div className="flex flex-col text-center min-h-screen items-center justify-center font-sans bg-[#0D0D0D]">
      
      
