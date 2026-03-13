@@ -167,7 +167,7 @@ grid[ny][nx]=2
 
 enemyTick.current++
 
-if(enemyTick.current % 6 === 0){
+if(enemyTick.current % 12 === 0){
 
 let ex=enemy.x+dirs[eDir.current][0]
 let ey=enemy.y+dirs[eDir.current][1]
