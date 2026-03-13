@@ -1,6 +1,5 @@
 "use client"
 import { useState, useEffect, useCallback, useRef } from "react"
-import Message from "@/public/components/Message"
 
 
 const Page = () => {
