@@ -1,5 +1,7 @@
 "use client"
 import { useState, useEffect, useCallback, useRef } from "react"
+import Message from "@/public/components/Message"
+
 
 const Page = () => {
 
@@ -9,6 +11,10 @@ const [isLocked,setIsLocked]=useState(false)
 const [mathData,setMathData]=useState<{question:string,solution:number}|null>(null)
 const [answer,setAnswer]=useState("")
 const [gameOver,setGameOver]=useState(false)
+const [isMessageVisible, setIsMessageVisible] = useState(false);
+const [message, setMessage] = useState("");
+const [messageType, setMessageType] = useState("");
+
 
 const pDir=useRef(0)
 const eDir=useRef(0)
@@ -41,7 +47,7 @@ setMathData({question:data.question,solution:data.solution})
 
 
 
-/* SCORE BASED ON SURVIVAL TIME */
+/* SCORE */
 
 useEffect(()=>{
 
@@ -57,7 +63,7 @@ return()=>clearInterval(timer)
 
 
 
-/* SPAWN DOOR (ONLY 1 PER ROW) */
+/* SPAWN DOOR  */
 
 const spawnDoor=(grid:number[][])=>{
 
@@ -67,7 +73,6 @@ while(!placed){
 
 const row=Math.floor(Math.random()*(grid.length-2))+1
 
-// if row already has a door skip
 if(grid[row].includes(5)) continue
 
 const possible:number[]=[]
@@ -163,7 +168,7 @@ grid[ny][nx]=2
 
 
 
-/* SLOW ENEMY */
+/*  ENEMY */
 
 enemyTick.current++
 

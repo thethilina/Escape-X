@@ -14,7 +14,6 @@ export default function Home() {
   const loader = useTopLoader();
   const router = useRouter();
 
-  // Auto-hide message after 3 seconds
   const showMessage = (msg: string, type: string) => {
     setMessage(msg);
     setMessageType(type);
