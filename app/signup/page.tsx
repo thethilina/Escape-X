@@ -6,15 +6,15 @@ import { useTopLoader } from "nextjs-toploader";
 
 import Message from "@/public/components/Message"
 
-import avatar1 from "../../../public/avatars/avatar1.png"
-import avatar2 from "../../../public/avatars/avatar2.png"
-import avatar3 from "../../../public/avatars/avatar3.png"
-import avatar4 from "../../../public/avatars/avatar4.png"
-import avatar5 from "../../../public/avatars/avatar5.png"
-import avatar6 from "../../../public/avatars/avatar6.png"
-import avatar7 from "../../../public/avatars/avatar7.png"
-import avatar8 from "../../../public/avatars/avatar8.png"
-import avatar9 from "../../../public/avatars/avatar9.png"
+import avatar1 from "../../public/avatars/avatar1.png"
+import avatar2 from "../../public/avatars/avatar2.png"
+import avatar3 from "../../public/avatars/avatar3.png"
+import avatar4 from "../../public/avatars/avatar4.png"
+import avatar5 from "../../public/avatars/avatar5.png"
+import avatar6 from "../../public/avatars/avatar6.png"
+import avatar7 from "../../public/avatars/avatar7.png"
+import avatar8 from "../../public/avatars/avatar8.png"
+import avatar9 from "../../public/avatars/avatar9.png"
 
 type Avatar = {
   name: string

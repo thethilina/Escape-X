@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTopLoader } from "nextjs-toploader";
 import Message from "@/public/components/Message";
+import { useContext } from "react";
+import UserContext from "@/lib/contexts/contexts";
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -13,6 +15,9 @@ export default function Home() {
   const [messageType, setMessageType] = useState("");
   const loader = useTopLoader();
   const router = useRouter();
+const { setUser } = useContext(UserContext);
+
+
 
   const showMessage = (msg: string, type: string) => {
     setMessage(msg);
@@ -35,6 +40,8 @@ export default function Home() {
       });
 
       if (response.ok) {
+         const data = await response.json(); 
+        setUser(data.user);
         showMessage("Login successful! Redirecting...", "success");
         setTimeout(() => router.push("/menu"), 1500);
       } else {
