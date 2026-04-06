@@ -1,78 +1,60 @@
 import { NextResponse } from "next/server";
 import connect from "@/lib/db";
-import User from "@/lib/models/users";
-import { request } from "http";
-import mongoose from "mongoose";
-import { Types } from "mongoose";
+import UserModel from "@/lib/models/users";
 import { sign } from "jsonwebtoken";
+import bcrypt from "bcryptjs"; 
 
+export const POST = async (request: Request) => {
+  try {
+    const body = await request.json();
+    const { username, password } = body;
 
-export const POST = async (request : Request) =>{
+    if (!username || !password) {
+      return NextResponse.json({ message: "Missing values" }, { status: 400 });
+    }
 
+    await connect();
 
-try{
+    const user = await UserModel.findOne({ username });
 
-const body =  await request.json();
-const {username , password} = body;
+    if (!user) {
+      return NextResponse.json({ message: "User not found!" }, { status: 404 });
+    }
 
-if(!username || !password || username === "" || password === ""){
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
 
-    return new NextResponse(JSON.stringify({message:"miing values"}) , {status:404})
-}
+    if (!isPasswordMatch) {
+      return NextResponse.json({ message: "Invalid password!" }, { status: 401 });
+    }
 
-await connect();
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error("JWT_SECRET not defined");
 
-const user = await User.findOne({username});
-const user2 = await User.findOne({username}).select("-password");
+    const payload = { id: user._id.toString() };
+    const token = sign(payload, secret, { expiresIn: "7d" });
 
+    const { password: _, ...userSafe } = user.toObject();
 
-if(!user){
+    const res = NextResponse.json({ user: userSafe });
+    const isProd = process.env.NODE_ENV === "production";
 
-    return new NextResponse(JSON.stringify({message:"User not found !"}) , {status:404})
-}
+    res.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      path: "/",
+      secure: isProd,          
+      sameSite: isProd ? "none" : "lax", 
+      maxAge: 7 * 24 * 60 * 60, 
+    });
 
-if(password !== user.password) {
-
-return new NextResponse(JSON.stringify({message:"Invalid password!"}) , {status:400})
-}
-
-const secret = process.env.JWT_SECRET;
-if (!secret) {
-    throw new Error("JWT_SECRET is not defined in .env");
-}
-
-
-const payload = {id: user._id.toString() , email : user.email}
-const token = sign(payload , secret , {expiresIn : "7d"});
-
-const res = NextResponse.json({user:user2});
-
-
-
-res.cookies.set({
-  name: "token",
-  value: token,
-  httpOnly: true,  
-  path: "/",
-  secure: true,  
-  sameSite: "none", 
-  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-});
-
-
-
-
-return res;
-
-
-
-}catch(e:any){
-
-return new NextResponse(JSON.stringify({message:"Error loggin: " + e.message}) , {status:500}  )
-
-
-}
-
-
-
-}
+    return res;
+    
+  } catch (e: any) {
+    console.error(e.message);
+    return NextResponse.json(
+      { message: "Error logging in: " + e.message },
+      { status: 500 }
+    );
+  }
+};

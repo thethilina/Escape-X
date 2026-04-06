@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import connect from "@/lib/db";
 import User from "@/lib/models/users";
-import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 function getLevel(score: number) {
   if (score >= 10000) return "Platinum";
@@ -15,19 +16,28 @@ export const POST = async (request: Request) => {
   try {
     await connect();
 
-    const body = await request.json();
-    const { userId, score } = body;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
-    if (!userId || score === undefined) {
-      return NextResponse.json(
-        { message: "Missing userId or score" },
-        { status: 400 }
-      );
+    if (!token) {
+      return NextResponse.json({ message: "No token" }, { status: 401 });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    } catch (err) {
+      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    }
+
+    const userId = decoded.id; 
+
+    const body = await request.json();
+    const { score } = body;
+
+    if (score === undefined) {
       return NextResponse.json(
-        { message: "Invalid user ID" },
+        { message: "Missing score" },
         { status: 400 }
       );
     }
@@ -49,7 +59,6 @@ export const POST = async (request: Request) => {
 
     if (score > user.topscore) {
       user.topscore = score;
-
       user.level = getLevel(score);
     }
 
@@ -64,7 +73,7 @@ export const POST = async (request: Request) => {
       { status: 200 }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return NextResponse.json(
       { message: "Server Error" },

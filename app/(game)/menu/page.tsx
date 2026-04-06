@@ -1,9 +1,20 @@
+"use client"
 import React from 'react'
 
 import pet from "../../../public/pet.png"
 import Link from 'next/link'
 
 function page() {
+
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
+
   return (
    <div className="flex text-center min-h-screen items-center space-x-30 justify-center align-middle   bg-[#0D0D0D]">  
    
@@ -14,7 +25,7 @@ function page() {
         <Link href="/play"><button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Play</button></Link>
         <Link href="/leaderboard"><button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Leader Board</button></Link>
         <Link href="/profile"><button className='bg-[#20181D] px-3 py-4 text-xl rounded-2xl border border-[#FFF4F4] w-50 hover:cursor-pointer hover:bg-[#333450]'>Profile</button></Link>
-     <h2 className='text-xl font-bold text-[#aa2c2c] hover:cursor-pointer px-3'>Log Out</h2>
+     <button onClick={logout} className='text-xl font-bold text-[#aa2c2c] hover:cursor-pointer px-3'>Log Out</button>
 </div>
 
    
