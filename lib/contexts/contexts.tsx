@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useState, ReactNode } from "react";
+import { createContext, useState, ReactNode, useEffect } from "react";
 
 interface HistoryItem {
   date: string;
@@ -33,9 +33,34 @@ const UserContext = createContext<UserContextType>({
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
 
-  const logout = () => setUser(null);
+  // ✅ Load user from localStorage on app start
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUserState(JSON.parse(storedUser));
+      }
+    } catch (err) {
+      console.error("Failed to load user", err);
+    }
+  }, []);
+
+  // ✅ Wrap setter to also save to localStorage
+  const setUser = (user: User | null) => {
+    setUserState(user);
+
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  };
+
+  const logout = () => {
+    setUser(null); // this will also clear localStorage
+  };
 
   return (
     <UserContext.Provider value={{ user, setUser, logout }}>

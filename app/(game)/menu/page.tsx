@@ -36,7 +36,7 @@ function page() {
       <div className="relative w-60 h-60 border-2 border-gray-600 rounded-full flex items-center justify-center">
         <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-3 text-gray-400 text-xl">3</span>
         
-        <div className="w-50 h-50 border-2 flex items-center justify-center  border-gray-600 rounded-full"> </div>
+        <div className="w-50 h-50 border-2 flex items-center justify-center text-5xl  border-gray-600 rounded-full"> ∑</div>
       </div>
     </div>
   </div>

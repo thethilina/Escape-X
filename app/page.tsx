@@ -42,6 +42,7 @@ const { setUser } = useContext(UserContext);
       if (response.ok) {
          const data = await response.json(); 
         setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
         showMessage("Login successful! Redirecting...", "success");
         setTimeout(() => router.push("/menu"), 1500);
       } else {

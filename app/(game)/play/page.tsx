@@ -25,7 +25,6 @@ const setMessageRef = useRef(setMessage)
 const setMessageTypeRef = useRef(setMessageType)
 const setIsMessageVisibleRef = useRef(setIsMessageVisible)
 
-// Keep all refs in sync
 useEffect(() => { scoreRef.current = score }, [score])
 useEffect(() => { userRef.current = user }, [user])
 useEffect(() => { setUserRef.current = setUser }, [setUser])
@@ -282,106 +281,128 @@ resetGame()
 setGameStarted(true)
 }
 
-return(
-<div className="flex min-h-screen items-center justify-center bg-[#0D0D0D] text-white p-4">
-{isMessageVisible && (
-<Message message={message} type={messageType} />
-)}
+return (
+  <div className="flex min-h-screen items-center justify-center bg-[#0D0D0D] text-white p-4 font-sans antialiased">
+    {isMessageVisible && (
+      <div className="fixed top-5 z-50 animate-pulse">
+        <Message message={message} type={messageType} />
+      </div>
+    )}
 
-<div className="flex gap-x-5 h-[520px]">
+    {/* Main Container - Unified height for alignment */}
+    <div className="flex gap-x-6 h-[750px]">
 
-{/* LEFT PANEL */}
-<div className="border rounded-xl p-6 bg-[#0e0e0e] w-[320px] flex flex-col justify-between">
-<div>
-<h2 className="text-2xl font-bold mb-4 text-[#19A4E0] text-center">HOW TO PLAY</h2>
-<div className="text-left space-y-3 text-sm">
-<p><strong>Blue Circle:</strong> You</p>
-<p><strong>Red Circle:</strong> Enemy</p>
-<p><strong>Pink Square:</strong> Door (Solve math to pass)</p>
-<div className="pt-2 border-t border-gray-700">
-<p><strong>Controls:</strong></p>
-<p>• The player moves automatically in the current direction</p>
-<p>• When you hit a wall, you turn automatically</p>
-<p>• Reach the pink door → Solve the math puzzle → Continue</p>
-<p>• Don't let the red enemy catch you!</p>
-</div>
-</div>
-</div>
+      {/* LEFT PANEL */}
+      <div className="border border-white/20 rounded-2xl p-6 bg-[#0e0e0e] w-[320px] flex flex-col justify-between shadow-2xl">
+        <div>
+          <h2 className="text-2xl font-black mb-6 text-[#19A4E0] text-center tracking-tighter uppercase">Operations</h2>
+          <div className="text-left space-y-5 text-sm">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#1750cc] rounded-full w-4 h-4 shadow-[0_0_10px_#1750cc]"></div>
+                <p><strong className="text-white">Player:</strong> Blue Unit</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="bg-[#9c2828] rounded-full w-4 h-4 shadow-[0_0_10px_red]"></div>
+                <p><strong className="text-white">Enemy:</strong> Red Threat</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="bg-[#c245ad] w-4 h-4 border border-[#19A4E0]"></div>
+                <p><strong className="text-white">Gate:</strong> Math Lock</p>
+              </div>
+            </div>
+            
+            <div className="pt-5 border-t border-white/10 space-y-2 text-gray-400 italic">
+              <p>• Auto-navigation engaged</p>
+              <p>• Bounce off walls to turn</p>
+              <p>• Solve Gate to bypass</p>
+              <p>• Evade enemy contact</p>
+            </div>
+          </div>
+        </div>
 
-{!gameStarted && !gameOver && (
-<button
-onClick={startGame}
-className="mt-6 w-full bg-[#19A4E0] hover:bg-[#1487b8] text-black font-bold py-3 rounded-lg text-lg transition"
->
-START GAME
-</button>
-)}
+        <div className="pt-4">
+          {!gameStarted && !gameOver && (
+            <button onClick={startGame} className="w-full bg-[#19A4E0] hover:bg-[#1487b8] text-black font-black py-4 rounded-xl text-xl transition-all active:scale-95 shadow-lg">
+              START GAME
+            </button>
+          )}
 
-{gameOver && (
-<button
-onClick={startGame}
-className="mt-6 w-full bg-[#DF88D6] hover:bg-[#c76ab8] text-black font-bold py-3 rounded-lg text-lg transition"
->
-TRY AGAIN
-</button>
-)}
-</div>
+          {gameOver && (
+            <button onClick={startGame} className="w-full bg-[#DF88D6] hover:bg-[#c76ab8] text-black font-black py-4 rounded-xl text-xl transition-all active:scale-95 shadow-lg">
+              RETRY
+            </button>
+          )}
+        </div>
+      </div>
 
-{/* RIGHT PANEL */}
-<div className="flex flex-col justify-between h-full">
+      {/* RIGHT PANEL - Aligned with Left Panel height */}
+      <div className="flex flex-col gap-y-4 h-full w-[600px]">
 
-{/* MAZE */}
-<div className="border rounded-xl p-6 bg-[#0e0e0e]">
-{maze.map((row,rI)=>(
-<div key={rI} className="flex">
-{row.map((cell,cI)=>{
-if(cell===0) return <div key={cI} className="bg-[#1A2835] border border-[#19A4E0] w-6 h-6"></div>
-if(cell===5) return <div key={cI} className="bg-[#c245ad] border border-[#19A4E0] w-6 h-6"></div>
-if(cell===1) return <div key={cI} className="bg-[#9c2828] rounded-full w-6 h-6 shadow-[0_0_10px_red]"></div>
-if(cell===2) return <div key={cI} className="bg-[#1750cc] rounded-full w-6 h-6 shadow-[0_0_10px_#1750cc]"></div>
-return <div key={cI} className="w-6 h-6"></div>
-})}
-</div>
-))}
-</div>
+        {/* MAZE SECTION (40%) */}
+        <div className="h-[40%] border border-white/20 rounded-2xl p-5 bg-[#0e0e0e] flex items-center justify-center overflow-hidden shadow-xl">
+          <div className="inline-block border border-white/5 p-1 bg-black/20">
+            {maze.map((row, rI) => (
+              <div key={rI} className="flex">
+                {row.map((cell, cI) => {
+                  const size = "w-7 h-7"; 
+                  if (cell === 0) return <div key={cI} className={`bg-[#1A2835] border border-[#19A4E0]/20 ${size}`}></div>
+                  if (cell === 5) return <div key={cI} className={`bg-[#c245ad] border border-[#19A4E0] ${size}`}></div>
+                  if (cell === 1) return <div key={cI} className={`bg-[#9c2828] rounded-full shadow-[0_0_8px_red] ${size} scale-90`}></div>
+                  if (cell === 2) return <div key={cI} className={`bg-[#1750cc] rounded-full shadow-[0_0_8px_#1750cc] ${size} scale-90`}></div>
+                  return <div key={cI} className={size}></div>
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
 
-{/* BOTTOM PANEL */}
-<div className="border rounded-xl space-y-4 p-4 bg-[#0e0e0e] w-[500px]">
-<div className="flex justify-between font-bold text-xl">
-<h1>Score: {score}</h1>
-<h1>Distance: {distance}</h1>
-</div>
+        {/* HUD & PROBLEM SECTION (60%) */}
+        <div className="h-[60%] border border-white/20 rounded-2xl bg-[#0e0e0e] flex flex-col p-6 shadow-2xl overflow-hidden">
+          <div className="flex justify-between font-black text-2xl mb-4 border-b border-white/5 pb-2">
+            <h1 className="text-[#19A4E0]">Score: {score}</h1>
+            <h1 className="text-[#DF88D6]">Dist: {distance}</h1>
+          </div>
 
-<div className="bg-[#161616] h-40 rounded-xl overflow-hidden flex items-center justify-center">
-{mathData
-? <img src={mathData.question} className="w-full h-full object-contain p-2"/>
-: <span className="opacity-20 text-lg">CIRCUIT ACTIVE</span>
-}
-</div>
+          {/* IMAGE BOX - Centered and Large */}
+          <div className="flex-grow bg-[#161616] rounded-xl flex items-center justify-center border border-white/10 overflow-hidden mb-6 shadow-inner">
+            {mathData ? (
+              <img 
+                src={mathData.question} 
+                className="w-full h-full object-contain p-4" 
+                alt="Math Question" 
+              />
+            ) : (
+              <span className="opacity-10 text-xl font-black tracking-[0.5em]">SYSTEM STANDBY</span>
+            )}
+          </div>
 
-<div className="flex justify-between items-center">
-<input
-value={answer}
-onChange={(e)=>setAnswer(e.target.value)}
-disabled={!isLocked}
-className="bg-transparent border-b border-white text-center w-32 text-2xl focus:outline-none"
-type="number"
-placeholder="Answer"
-/>
-<button
-onClick={handleGo}
-disabled={!isLocked}
-className="bg-[#DF88D6] disabled:bg-gray-700 disabled:text-gray-400 text-black font-bold px-10 py-2 rounded-lg transition"
->
-Go
-</button>
-</div>
-</div>
+          {/* INPUT & BUTTON - Sleek footer alignment */}
+          <div className="flex justify-between items-center gap-x-8 px-2 pb-2">
+            <div className="flex-1">
+              <input
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                disabled={!isLocked}
+                className="bg-transparent border-b-2 border-white/20 w-full py-2 text-left text-5xl font-black focus:outline-none focus:border-[#19A4E0] transition-all placeholder:text-white/5"
+                type="number"
+                placeholder="VAL"
+              />
+            </div>
+            <button
+              onClick={handleGo}
+              disabled={!isLocked}
+              className="bg-[#DF88D6] disabled:bg-gray-800 disabled:text-gray-500 text-black font-black px-12 py-3 rounded-lg text-xl transition-all active:scale-95 shadow-md uppercase"
+            >
+              Go
+            </button>
+          </div>
+        </div>
 
-</div>
-</div>
-</div>
-)
+      </div>
+    </div>
+  </div>
+);
 }
 
 export default Page
