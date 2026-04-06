@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Image, { StaticImageData } from "next/image"
 import { useRouter } from "next/navigation"
 import { useTopLoader } from "nextjs-toploader";
@@ -22,170 +22,213 @@ type Avatar = {
 }
 
 export default function Page() {
+  const avatars: Avatar[] = [
+    { name: "avatar1", img: avatar1 },
+    { name: "avatar2", img: avatar2 },
+    { name: "avatar3", img: avatar3 },
+    { name: "avatar4", img: avatar4 },
+    { name: "avatar5", img: avatar5 },
+    { name: "avatar6", img: avatar6 },
+    { name: "avatar7", img: avatar7 },
+    { name: "avatar8", img: avatar8 },
+    { name: "avatar9", img: avatar9 }
+  ]
 
-const avatars: Avatar[] = [
-  { name: "avatar1", img: avatar1 },
-  { name: "avatar2", img: avatar2 },
-  { name: "avatar3", img: avatar3 },
-  { name: "avatar4", img: avatar4 },
-  { name: "avatar5", img: avatar5 },
-  { name: "avatar6", img: avatar6 },
-  { name: "avatar7", img: avatar7 },
-  { name: "avatar8", img: avatar8 },
-  { name: "avatar9", img: avatar9 }
-]
-
-const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null)
-const [username, setUsername] = useState("")
-const [password, setPassword] = useState("")
-const [confirmPassword, setConfirmPassword] = useState("")
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null)
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const loader = useTopLoader();
 
-const [message, setMessage] = useState("")
-const [messageType, setMessageType] = useState<"error" | "success" | "">("")
+  const [message, setMessage] = useState("")
+  const [messageType, setMessageType] = useState<"error" | "success" | "">("")
 
-const router = useRouter()
+  const router = useRouter()
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-const showMessage = (msg:string,type:"error"|"success") => {
-  setMessage(msg)
-  setMessageType(type)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  setTimeout(()=>{
-    setMessage("")
-    setMessageType("")
-  },3000)
-}
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault()
+    const chars = "01<>[]{}/\\-=_+π$λ∑&%#".split("");
+    const fontSize = 18;
+    const streamCount = 70; 
 
-  if(!selectedAvatar){
-    showMessage("Please select an avatar","error")
-    return
+    const streams = Array.from({ length: streamCount }, () => ({
+      x: Math.floor(Math.random() * (canvas.width / fontSize)) * fontSize,
+      y: Math.random() * -canvas.height,
+      speed: 2 + Math.random() * 3,
+      char: chars[Math.floor(Math.random() * chars.length)],
+      opacity: 0.1 + Math.random() * 0.3 
+    }));
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0D0D0D";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = `bold ${fontSize}px monospace`;
+
+      streams.forEach((stream) => {
+        ctx.fillStyle = `rgba(244, 107, 198, ${stream.opacity})`;
+        ctx.fillText(stream.char, stream.x, stream.y);
+
+        stream.y += stream.speed;
+
+        if (Math.random() > 0.96) {
+          stream.char = chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        if (stream.y > canvas.height) {
+          stream.y = -20;
+          stream.x = Math.floor(Math.random() * (canvas.width / fontSize)) * fontSize;
+        }
+      });
+      requestAnimationFrame(draw);
+    };
+
+    const animationId = requestAnimationFrame(draw);
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const showMessage = (msg: string, type: "error" | "success") => {
+    setMessage(msg)
+    setMessageType(type)
+    setTimeout(() => {
+      setMessage("")
+      setMessageType("")
+    }, 3000)
   }
 
-  if(password !== confirmPassword){
-    showMessage("Passwords do not match","error")
-    return
-  }
-
-  try {
-      loader.start();
-
-    const response = await fetch("/api/auth/register",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        username,
-        password,
-        avatar:selectedAvatar
-      })
-    })
-
-    const data = await response.json()
-
-    if(response.ok){
-
-      showMessage("Registration successful","success")
-
-      setTimeout(()=>{
-        router.push("/")
-      },1200)
-
-    }else{
-      showMessage(data.message || "Registration failed","error")
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedAvatar) {
+      showMessage("Please select an avatar", "error")
+      return
+    }
+    if (password !== confirmPassword) {
+      showMessage("Passwords do not match", "error")
+      return
     }
 
-  } catch (error) {
-    console.error(error)
-    showMessage("Server error occurred","error")
-  } finally {
-    loader.done()
+    try {
+      loader.start();
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, avatar: selectedAvatar })
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        showMessage("Registration successful", "success")
+        setTimeout(() => router.push("/"), 1200)
+      } else {
+        showMessage(data.message || "Registration failed", "error")
+      }
+    } catch (error) {
+      console.error(error)
+      showMessage("Server error occurred", "error")
+    } finally {
+      loader.done()
+    }
   }
-}
 
-return (
-<div className="flex flex-col text-center min-h-screen items-center space-y-20 justify-center font-sans bg-[#0D0D0D]">
+  return (
+    <div className="relative flex flex-col text-center min-h-screen items-center space-y-20 justify-center font-sans bg-[#0D0D0D] overflow-hidden">
+      
+      <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full z-0" />
 
-{message && <Message message={message} type={messageType} />}
+      {message && <Message message={message} type={messageType} />}
 
-<h1
-className="jaro-font text-7xl text-[#F46BC6]"
-style={{ textShadow: "1px 2px 0px #FFFFFF" }}
->
-Escape-X
-</h1>
+      <div className="z-10 flex flex-col items-center space-y-16 w-full max-w-5xl">
+        <h1
+          className="jaro-font text-7xl text-[#F46BC6]"
+          style={{ textShadow: "1px 2px 0px #FFFFFF" }}
+        >
+          Escape-X
+        </h1>
 
-<div className="flex items-center gap-x-20">
+        <div className="flex flex-col md:flex-row items-center gap-x-24 gap-y-12">
 
-{/* avatars */}
-<div>
+          <div className="flex flex-col">
+            <h2 className="text-2xl text-[#a7a4a4] mb-6">
+              Choose your avatar
+            </h2>
 
-<h2 className="text-2xl text-[#a7a4a4] mb-4">
-Choose your avatar
-</h2>
+            <div className="grid grid-cols-3 gap-6">
+              {avatars.map((avatar) => (
+                <div 
+                  key={avatar.name}
+                  onClick={() => setSelectedAvatar(avatar.name)}
+                  className={`relative p-1 rounded-full transition-all duration-300 transform hover:scale-110 ${
+                    selectedAvatar === avatar.name 
+                    ? "bg-[#4e76fa] shadow-[0_0_20px_#4e76fa]" 
+                    : "bg-transparent"
+                  }`}
+                >
+                  <Image
+                    src={avatar.img}
+                    alt={avatar.name}
+                    className="w-24 h-24 rounded-full cursor-pointer border-2 border-[#1F2231] bg-[#0D0D0D]"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
 
-<div className="grid grid-cols-3 gap-4">
+          <form
+            onSubmit={handleRegister}
+            className="text-2xl space-y-10 items-start flex flex-col w-full md:w-96"
+          >
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Create A Username"
+              className="w-full border-b-2 border-gray-600 text-white bg-transparent focus:outline-none focus:border-pink-400 transition-all placeholder:text-gray-600"
+            />
 
-{avatars.map((avatar)=>(
-<Image
-key={avatar.name}
-src={avatar.img}
-alt={avatar.name}
-onClick={()=>setSelectedAvatar(avatar.name)}
-className={`w-24 h-24 rounded-full cursor-pointer hover:border-[#4e76fa]
-${
-selectedAvatar===avatar.name
-? "border-2 border-[#4e76fa] shadow-lg shadow-[#4e76fa]"
-: "border-2 border-transparent"
-}`}
-/>
-))}
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create A Password"
+              className="w-full border-b-2 border-gray-600 text-white bg-transparent focus:outline-none focus:border-[#4e76fa] transition-all placeholder:text-gray-600"
+            />
 
-</div>
-</div>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Your Password"
+              className="w-full border-b-2 border-gray-600 text-white bg-transparent focus:outline-none focus:border-[#4e76fa] transition-all placeholder:text-gray-600"
+            />
 
-<form
-onSubmit={handleRegister}
-className="text-2xl space-y-10 items-start flex flex-col"
->
+            <button
+              type="submit"
+              className="bg-[#1F2231] hover:bg-[#333450] text-white rounded-b-2xl rounded-r-2xl px-12 py-3 border border-[#FFF4F4] text-2xl transition-all active:scale-95"
+            >
+              Register
+            </button>
+          </form>
 
-<input
-type="text"
-value={username}
-onChange={(e)=>setUsername(e.target.value)}
-placeholder="Create A Username"
-className="w-full border-b-2 border-gray-300 text-white bg-transparent focus:outline-none focus:border-pink-400"
-/>
-
-<input
-type="password"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-placeholder="Create A Password"
-className="w-full border-b-2 border-gray-300 text-white bg-transparent focus:outline-none focus:border-[#4e76fa]"
-/>
-
-<input
-type="password"
-value={confirmPassword}
-onChange={(e)=>setConfirmPassword(e.target.value)}
-placeholder="Confirm Your Password"
-className="w-full border-b-2 border-gray-300 text-white bg-transparent focus:outline-none focus:border-[#4e76fa]"
-/>
-
-<button
-type="submit"
-className="bg-[#1F2231] rounded-b-2xl rounded-r-2xl px-8 py-3 border border-[#FFF4F4] text-2xl"
->
-Register
-</button>
-
-</form>
-
-</div>
-</div>
-)
+        </div>
+      </div>
+    </div>
+  )
 }
